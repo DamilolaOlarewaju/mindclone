@@ -1,96 +1,72 @@
 # MindClone
 
-MindClone is a personal AI chatbot app that will learn from an owner's quiz
-answers, uploaded memories, and ongoing corrections so visitors feel like they
-are talking to the real person.
+> A personal AI that talks like you, grounded in your own memories instead of generic answers.
 
-## Step 12 Status
+**[Live demo](https://mindclone-tau.vercel.app)**
 
-The foundation, Supabase layer, owner auth flow, personality quiz, and training
-pipeline are complete, the public visitor chat is live, and the owner-only
-private assistant mode is now live too. The correction system and analytics
-dashboard are live as well. The real profile settings are live now too, and the
-polish pass is finished. Deployment prep is in place too:
 
-- Next.js 14 App Router scaffold
-- Tailwind CSS design system and global tokens
-- shadcn-style project baseline with reusable UI primitives
-- Route shells for `/chat` and the owner dashboard areas
-- Responsive marketing, visitor, and owner layouts
-- Supabase browser/server/admin clients
-- Auth session refresh middleware
-- SQL migration for tables, pgvector, RLS, and storage buckets
-- `.env.example` and `supabase/README.md` setup docs
-- Owner sign-up and sign-in page
-- Protected dashboard access with sign-out
-- Multi-step personality quiz backed by Supabase
-- System prompt generation and manual prompt editing on the quiz route
-- Training uploads with source-type selection and secure storage writes
-- File parsing for `.txt`, `.pdf`, `.docx`, and Twitter archive `.json`
-- Voice note transcription through Gemini file understanding
-- Chunking and Gemini embeddings for pgvector-backed memory storage
-- Uploaded source list with status badges, chunk counts, and deletion
-- Visitor-facing profile page with start-chat flow
-- Public chat API route with RAG retrieval and Gemini streaming
-- Conversation and message persistence for visitor transcripts
-- Shareable `/chat` plus `/talk-to-{slug}` route support
-- Owner-only `/dashboard/private` assistant workspace
-- `owner_notes` table and UI for tasks, notes, and reminders
-- Private assistant chat route that uses both long-term memory and current owner notes
-- Fresh-thread flow plus persisted owner-private transcripts
-- Transcript review workspace on `/dashboard/corrections`
-- Correction creation and deletion actions backed by Supabase
-- Saved corrections now get appended back into future public and private prompts as durable rules
-- Memory-citation tracking for assistant replies grounded in uploaded sources
-- Owner analytics dashboard with visitor totals, message volume, topic summaries, recent transcripts, and source-usage rankings
-- Owner settings workspace for display name, bio, greeting, profile photo, slug, and visitor rules
-- Private public-link password gate with cookie-based unlock flow for visitors
-- Public chat page and API now respect owner visibility settings in real time
-- Global toast notifications for key owner and visitor actions
-- Route-level loading skeletons for the remaining dashboard and public chat flows
-- Mobile-safe spacing and scroll behavior for public and private chat transcripts
-- Polished owner shell with sticky header treatment and smoother small-screen navigation
-- `/api/health` deployment smoke-check endpoint for Vercel verification
-- Explicit Vercel-friendly `maxDuration` and `preferredRegion` config on the slow AI and training surfaces
-- `check:env`, `release:check`, `smoke:deploy`, and Vercel build/deploy npm scripts
-- `docs/vercel-deployment.md` launch guide for Supabase setup, Vercel envs, rollout, and smoke testing
 
-## Project Structure
+## What it does
 
-```text
-app/
-  auth/
-  dashboard/
-  chat/
-components/
-  auth/
-  dashboard/
-  layout/
-  ui/
-lib/
-  supabase/
-hooks/
-docs/
-scripts/
-supabase/
-  migrations/
+MindClone lets anyone create an AI version of themselves. The owner answers a personality quiz, uploads their memories, and corrects the AI over time. Visitors then chat through a shareable link and feel like they're talking to the real person.
+
+## Features
+
+- **Personality quiz** that generates the AI's system prompt, which the owner can edit
+- **Memory uploads**: `.txt`, `.pdf`, `.docx`, Twitter archives, and voice notes (transcribed with Gemini)
+- **Public visitor chat** with streaming replies, a shareable link, and optional password protection
+- **Private assistant** for the owner, with notes, tasks, and reminders alongside long-term memory
+- **Corrections system**: the owner reviews transcripts, and saved corrections become permanent rules in future replies
+- **Analytics dashboard**: visitor totals, message volume, topics, and which memories get used most
+- **Owner settings**: display name, bio, greeting, photo, custom link, and visitor rules
+
+## How it works
+
+```mermaid
+flowchart LR
+    A[Owner uploads memories] --> B[Parse files and transcribe audio]
+    B --> C[Chunk text]
+    C --> D[Gemini embeddings]
+    D --> E[(Supabase pgvector)]
+    F[Visitor asks a question] --> G[Retrieve relevant memory chunks]
+    E --> G
+    G --> H[Gemini + quiz prompt + saved corrections]
+    H --> I[Streamed reply, with cited memories]
 ```
 
-## Commands
+The RAG pipeline was written with help from OpenAI Codex.
+
+## Tech stack
+
+- **Frontend:** Next.js 14 (App Router), Tailwind CSS, shadcn-style UI components
+- **Backend and data:** Supabase (auth, Postgres, pgvector, storage)
+- **AI:** Gemini (chat, embeddings, voice transcription)
+- **Deployment:** Vercel
+
+## Getting started
 
 ```bash
 npm install
+cp .env.example .env.local   # then add your own Supabase and Gemini keys
 npm run dev
-npm run check:env
-npm run lint
-npm run typecheck
-npm run release:check
-npm run smoke:deploy -- https://your-deployment-url.com
 ```
 
-## Launch Notes
+Other useful commands: `npm run check:env`, `npm run lint`, `npm run typecheck`, `npm run release:check`.
 
-The codebase is deployment-ready, but I did not perform a live Vercel rollout
-from this workspace because real Vercel, Supabase, and Gemini
-credentials are not available here. Use [docs/vercel-deployment.md](docs/vercel-deployment.md)
-to connect the real project and ship it.
+For Supabase setup, see [`supabase/README.md`](supabase/README.md). For deployment, see [`docs/vercel-deployment.md`](docs/vercel-deployment.md).
+
+## Project structure
+
+```
+app/          routes: auth, dashboard, chat
+components/   UI components
+lib/          Supabase clients and helpers
+hooks/        React hooks
+scripts/      env checks and deploy smoke tests
+supabase/     migrations and setup docs
+docs/         deployment guide
+```
+
+## Status
+
+The full feature set above is built, and deployment scripts and a health-check endpoint are included. See [`docs/`](docs/) for the launch guide.
